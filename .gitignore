@@ -130,3 +130,6 @@ dmypy.json
 
 # JetBrains 😡
 .idea/
+
+# Файл с ссылками
+links
