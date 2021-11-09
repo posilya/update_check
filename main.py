@@ -5,6 +5,8 @@ from lxml import html
 import requests
 import os
 
+import config
+
 
 def new_links(old, actual):
     r = []
@@ -18,7 +20,7 @@ def new_links(old, actual):
 def get_title(link):
     page = requests.get(link)
     if page.status_code == 200:
-        title = os.environ['TITLE']
+        title = config.title
         if title == '':
             title = '//title'
 
@@ -35,13 +37,13 @@ def post(link):
     if title != '':
         text = title + '\n' + text
 
-    url = 'https://api.telegram.org/bot' + os.environ['BOT_TOKEN']
+    url = 'https://api.telegram.org/bot' + config.bot_token
     method = url + '/sendMessage'
 
     request = requests.post(
         method,
         data={
-            'chat_id': os.environ['CHANNEL'],
+            'chat_id': config.channel,
             'text': text,
         }
     )
@@ -49,8 +51,8 @@ def post(link):
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-site = os.environ['SITE']
-array_links = os.environ['ARRAY_LINKS'] + '//a'
+site = config.site
+array_links = config.array_links + '//a'
 
 old_links = []
 try:
