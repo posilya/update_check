@@ -133,3 +133,6 @@ dmypy.json
 
 # Файл с ссылками
 links
+
+# Конфиг
+config.py
