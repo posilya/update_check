@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: UTF-8 -*-
 
 from urllib.parse import urljoin
 from lxml import html
@@ -9,6 +9,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 site = 'https://www.uksap.ru/'
 array_links = '//div[@class="news-list"][1]' + '//a'
+
+old_links = []
+try:
+    with open(os.path.join(BASE_DIR, 'links'), 'r') as file:
+        old_links = file.read().split('\n')
+except FileNotFoundError:
+    print('Файла нет, но мы не расстраиваемся')
 
 response = requests.get(site)
 if response.status_code == 200:
