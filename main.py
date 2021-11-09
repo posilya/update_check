@@ -5,6 +5,8 @@ from lxml import html
 import requests
 import os
 
+import config
+
 
 def new_links(old, actual):
     r = []
@@ -12,14 +14,45 @@ def new_links(old, actual):
         if i not in old:
             r.append(i)
             old.append(i)  # избавляемся от дубликатов
-            print(i)
     return r
+
+
+def get_title(link):
+    page = requests.get(link)
+    if page.status_code == 200:
+        title = config.title
+        if title == '':
+            title = '//title'
+
+        page = html.fromstring(page.content)
+        r = page.xpath(title)[0].text
+        return r
+    else:
+        return ''
+
+
+def post(link):
+    title = get_title(link)
+    text = link
+    if title != '':
+        text = title + '\n' + text
+
+    url = 'https://api.telegram.org/bot' + config.bot_token
+    method = url + '/sendMessage'
+
+    request = requests.post(
+        method,
+        data={
+            'chat_id': config.channel,
+            'text': text,
+        }
+    )
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-site = 'https://www.uksap.ru/'
-array_links = '//div[@class="news-list"][1]' + '//a'
+site = config.site
+array_links = config.array_links + '//a'
 
 old_links = []
 try:
@@ -35,7 +68,9 @@ if response.status_code == 200:
     links = [urljoin(site, link.attrib['href']) for link in tree.xpath(array_links)]
     links = list(set(links))
 
-    new = new_links(old_links, links)
+    new_links = new_links(old_links, links)
+    for link in new_links:
+        post(link)
 
     with open(os.path.join(BASE_DIR, 'links'), 'w') as file:
         file.write('\n'.join(links))
